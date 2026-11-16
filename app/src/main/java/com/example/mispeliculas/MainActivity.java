@@ -1,6 +1,8 @@
 package com.example.mispeliculas;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.database.sqlite.SQLiteException;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +13,8 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     EditText editPelicula;
@@ -18,8 +22,10 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout layoutPeliculas;
     TextView txtContador;
 
-    int cantidadPeliculas = 0;
-    int cantidadVistas = 0;
+    private static final String ESTADO_TITULOS = "peliculas.titulos";
+    private static final String ESTADO_VISTAS = "peliculas.vistas";
+    private PeliculasDbHelper base;
+    private final ArrayList<Pelicula> peliculas = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +37,15 @@ public class MainActivity extends AppCompatActivity {
         layoutPeliculas = findViewById(R.id.layoutPeliculas);
         txtContador = findViewById(R.id.txtContador);
 
+        base = new PeliculasDbHelper(this, recuperarEstadoAnterior(savedInstanceState));
+        try {
+            peliculas.addAll(base.listar());
+        } catch (SQLiteException error) {
+            mostrarErrorGuardado();
+            btnAgregar.setEnabled(false);
+        }
+        mostrarPeliculas();
+
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -41,21 +56,43 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(
                             MainActivity.this,
-                            "Escribí el nombre de una película",
+                            R.string.mensaje_nombre_vacio,
                             Toast.LENGTH_SHORT
                     ).show();
 
                 } else {
 
-                    agregarPelicula(nombrePelicula);
-
-                    editPelicula.setText("");
+                    if (agregarPelicula(nombrePelicula)) {
+                        editPelicula.setText("");
+                    }
                 }
             }
         });
     }
 
-    private void agregarPelicula(String nombre) {
+    private boolean agregarPelicula(String nombre) {
+        final Pelicula pelicula;
+        try {
+            pelicula = base.agregar(nombre);
+        } catch (SQLiteException error) {
+            mostrarErrorGuardado();
+            return false;
+        }
+        peliculas.add(pelicula);
+        crearTarjeta(pelicula);
+        actualizarContadores();
+        return true;
+    }
+
+    private void mostrarPeliculas() {
+        layoutPeliculas.removeAllViews();
+        for (Pelicula pelicula : peliculas) {
+            crearTarjeta(pelicula);
+        }
+        actualizarContadores();
+    }
+
+    private void crearTarjeta(Pelicula pelicula) {
 
         // Tarjeta principal de la película
         LinearLayout tarjetaPelicula = new LinearLayout(this);
@@ -74,18 +111,10 @@ public class MainActivity extends AppCompatActivity {
         // Imagen de la película
         ImageView imagenPelicula = new ImageView(this);
 
-        if (nombre.equalsIgnoreCase("interestelar")) {
-            imagenPelicula.setImageResource(R.drawable.interestelar);
-
-        } else if (nombre.equalsIgnoreCase("sherk")) {
-            imagenPelicula.setImageResource(R.drawable.sherk);
-
-        } else if (nombre.equalsIgnoreCase("spiderman")) {
-            imagenPelicula.setImageResource(R.drawable.spiderman);
-
-        } else {
-            imagenPelicula.setImageResource(R.drawable.ic_launcher_foreground);
-        }
+        imagenPelicula.setImageResource(pelicula.getImagenResId());
+        imagenPelicula.setContentDescription(pelicula.getImagenResId() == R.drawable.ic_launcher_foreground
+                ? getString(R.string.imagen_no_disponible)
+                : getString(R.string.descripcion_poster, pelicula.getTitulo()));
 
         int anchoPoster = getResources().getDimensionPixelSize(R.dimen.poster_ancho);
         int altoPoster = getResources().getDimensionPixelSize(R.dimen.poster_alto);
@@ -113,19 +142,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Título
         TextView tituloPelicula = new TextView(this);
-        tituloPelicula.setText(nombre);
+        tituloPelicula.setText(pelicula.getTitulo());
         tituloPelicula.setTextSize(18);
         tituloPelicula.setTextColor(getColor(R.color.texto_principal));
 
         // Estado
         TextView estadoPelicula = new TextView(this);
-        estadoPelicula.setText("Estado: Pendiente");
+        estadoPelicula.setText(pelicula.isVista() ? R.string.estado_vista : R.string.estado_pendiente);
         estadoPelicula.setTextSize(14);
         estadoPelicula.setTextColor(getColor(R.color.texto_secundario));
 
         // Botón
         Button btnVista = new Button(this);
-        btnVista.setText("Marcar como vista");
+        btnVista.setText(pelicula.isVista() ? R.string.boton_vista : R.string.boton_marcar_vista);
+        btnVista.setEnabled(!pelicula.isVista());
 
         btnVista.setBackgroundTintList(
                 getColorStateList(R.color.rojo_principal)
@@ -136,19 +166,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                estadoPelicula.setText("Estado: ✓ Vista");
+                try {
+                    base.marcarVista(pelicula.getId());
+                } catch (SQLiteException error) {
+                    mostrarErrorGuardado();
+                    return;
+                }
+                pelicula.setVista(true);
+                estadoPelicula.setText(R.string.estado_vista);
 
-                btnVista.setText("Vista");
+                btnVista.setText(R.string.boton_vista);
                 btnVista.setEnabled(false);
-
-                cantidadVistas++;
 
                 actualizarContadores();
             }
         });
 
         Button btnEliminar = new Button(this);
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setText(R.string.boton_eliminar);
 
         btnEliminar.setBackgroundTintList(
                 getColorStateList(R.color.superficie_boton)
@@ -159,16 +194,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // Si la película estaba vista, bajamos también ese contador
-                if (!btnVista.isEnabled()) {
-                    cantidadVistas--;
+                try {
+                    base.eliminar(pelicula.getId());
+                } catch (SQLiteException error) {
+                    mostrarErrorGuardado();
+                    return;
                 }
-
+                peliculas.remove(pelicula);
                 layoutPeliculas.removeView(tarjetaPelicula);
 
-                cantidadPeliculas--;
-
                 actualizarContadores();
+            }
+        });
+
+        Button btnDetalle = new Button(this);
+        btnDetalle.setText(R.string.boton_ver_detalle);
+        btnDetalle.setBackgroundTintList(getColorStateList(R.color.superficie_boton));
+        btnDetalle.setTextColor(getColor(R.color.white));
+        btnDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DetallePeliculaActivity.class);
+                intent.putExtra(DetallePeliculaActivity.EXTRA_TITULO, pelicula.getTitulo());
+                intent.putExtra(DetallePeliculaActivity.EXTRA_VISTA, pelicula.isVista());
+                intent.putExtra(DetallePeliculaActivity.EXTRA_IMAGEN, pelicula.getImagenResId());
+                startActivity(intent);
             }
         });
 
@@ -177,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         datosPelicula.addView(estadoPelicula);
         datosPelicula.addView(btnVista);
         datosPelicula.addView(btnEliminar);
+        datosPelicula.addView(btnDetalle);
 
         // Armamos la tarjeta completa
         tarjetaPelicula.addView(imagenPelicula);
@@ -184,11 +235,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Agregamos la tarjeta a "Mi lista"
         layoutPeliculas.addView(tarjetaPelicula);
-
-        cantidadPeliculas++;
-
-        actualizarContadores();
-
     }
 
     private void actualizarContadores() {
@@ -196,9 +242,48 @@ public class MainActivity extends AppCompatActivity {
         txtContador.setText(
                 getString(
                         R.string.contador,
-                        cantidadPeliculas,
-                        cantidadVistas
+                        getCantidadPeliculas(),
+                        getCantidadVistas()
                 )
         );
+    }
+
+    int getCantidadPeliculas() {
+        return peliculas.size();
+    }
+
+    int getCantidadVistas() {
+        int vistas = 0;
+        for (Pelicula pelicula : peliculas) {
+            if (pelicula.isVista()) vistas++;
+        }
+        return vistas;
+    }
+
+    // Compatibilidad con un Bundle de etapa 3 al actualizar la app con una tarea abierta.
+    // Solo se utiliza si SQLite debe crear la base por primera vez (incluso lista vacía).
+    private ArrayList<Pelicula> recuperarEstadoAnterior(Bundle estado) {
+        if (estado == null) return null;
+        ArrayList<String> titulos = estado.getStringArrayList(ESTADO_TITULOS);
+        boolean[] vistas = estado.getBooleanArray(ESTADO_VISTAS);
+        if (titulos == null || vistas == null || titulos.size() != vistas.length) return null;
+        ArrayList<Pelicula> anteriores = new ArrayList<>();
+        for (int i = 0; i < titulos.size(); i++) {
+            String titulo = titulos.get(i);
+            if (titulo != null && !titulo.trim().isEmpty()) {
+                anteriores.add(new Pelicula(titulo, CatalogoPeliculas.imagenParaTitulo(titulo), vistas[i]));
+            }
+        }
+        return anteriores;
+    }
+
+    private void mostrarErrorGuardado() {
+        Toast.makeText(this, R.string.error_guardado, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (base != null) base.close();
+        super.onDestroy();
     }
 }

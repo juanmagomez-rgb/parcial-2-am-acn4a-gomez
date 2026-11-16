@@ -22,4 +22,15 @@
 
     <string name="contador">Películas guardadas: %1$d | Vistas: %2$d</string>
 
+    <string name="boton_ver_detalle">Ver detalle</string>
+    <string name="titulo_detalle">Detalle de película</string>
+    <string name="boton_volver_lista">Volver a mi lista</string>
+    <string name="error_detalle">No se pudo abrir esta película</string>
+    <string name="imagen_no_disponible">Imagen no disponible</string>
+    <string name="descripcion_poster">Póster de %1$s</string>
+    <string name="error_guardado">No se pudo acceder a las películas guardadas. Intentá nuevamente.</string>
+    <string name="titulo_sinopsis">Sinopsis</string>
+    <string name="detalle_anio">Año de estreno: %1$d</string>
+    <string name="detalle_genero">Género: %1$s</string>
+    <string name="descripcion_no_disponible">Descripción no disponible</string>
 </resources>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo_app"
+    android:padding="@dimen/detalle_padding">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/titulo_detalle"
+                android:textColor="@color/rojo_principal"
+                android:textSize="@dimen/detalle_titulo"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgDetallePoster"
+                android:layout_width="@dimen/detalle_poster_ancho"
+                android:layout_height="@dimen/detalle_poster_alto"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/detalle_espacio"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/imagen_no_disponible"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/txtSinImagen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/imagen_no_disponible"
+                android:textColor="@color/texto_secundario"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/txtDetalleTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detalle_espacio"
+                android:textColor="@color/texto_principal"
+                android:textSize="@dimen/detalle_titulo"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDetalleEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detalle_espacio"
+                android:textColor="@color/texto_secundario"
+                android:textSize="@dimen/detalle_estado" />
+
+            <LinearLayout
+                android:id="@+id/layoutFicha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detalle_espacio"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtDetalleAnio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/texto_secundario"
+                    android:textSize="@dimen/ficha_texto" />
+
+                <TextView
+                    android:id="@+id/txtDetalleGenero"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/texto_secundario"
+                    android:textSize="@dimen/ficha_texto" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/detalle_espacio"
+                    android:text="@string/titulo_sinopsis"
+                    android:textColor="@color/rojo_principal"
+                    android:textSize="@dimen/detalle_estado"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtDetalleSinopsis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/texto_principal"
+                    android:textSize="@dimen/ficha_texto" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnVolverLista"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detalle_espacio"
+                android:text="@string/boton_volver_lista"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/superficie_boton" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

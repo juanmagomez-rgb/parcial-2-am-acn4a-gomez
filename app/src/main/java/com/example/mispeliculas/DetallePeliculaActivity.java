@@ -1,0 +1,81 @@
+package com.example.mispeliculas;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class DetallePeliculaActivity extends AppCompatActivity {
+
+    public static final String EXTRA_TITULO = "titulo";
+    public static final String EXTRA_VISTA = "vista";
+    public static final String EXTRA_IMAGEN = "imagenResId";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detalle_pelicula);
+
+        Button volver = findViewById(R.id.btnVolverLista);
+        volver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Cerramos el detalle: no creamos otra pantalla principal.
+                finish();
+            }
+        });
+
+        TextView titulo = findViewById(R.id.txtDetalleTitulo);
+        TextView estado = findViewById(R.id.txtDetalleEstado);
+        ImageView imagen = findViewById(R.id.imgDetallePoster);
+        TextView sinImagen = findViewById(R.id.txtSinImagen);
+
+        Bundle extras = getIntent().getExtras();
+        // Comprobamos también los tipos para no interpretar un dato inválido como false.
+        Object nombre = extras == null ? null : extras.get(EXTRA_TITULO);
+        Object vista = extras == null ? null : extras.get(EXTRA_VISTA);
+        if (!(nombre instanceof String) || ((String) nombre).trim().isEmpty()
+                || !(vista instanceof Boolean)) {
+            titulo.setText(R.string.error_detalle);
+            estado.setVisibility(View.GONE);
+            imagen.setVisibility(View.GONE);
+            return;
+        }
+
+        String nombrePelicula = ((String) nombre).trim();
+        titulo.setText(nombrePelicula);
+        estado.setText((Boolean) vista ? R.string.estado_vista : R.string.estado_pendiente);
+
+        // La ficha es contenido del catálogo, no estado editable ni dato persistido de Pelicula.
+        findViewById(R.id.layoutFicha).setVisibility(View.VISIBLE);
+        TextView anio = findViewById(R.id.txtDetalleAnio);
+        TextView genero = findViewById(R.id.txtDetalleGenero);
+        TextView sinopsis = findViewById(R.id.txtDetalleSinopsis);
+        CatalogoPeliculas.Ficha ficha = CatalogoPeliculas.fichaParaTitulo(nombrePelicula);
+        if (ficha == null) {
+            anio.setVisibility(View.GONE);
+            genero.setVisibility(View.GONE);
+            sinopsis.setText(R.string.descripcion_no_disponible);
+        } else {
+            anio.setText(getString(R.string.detalle_anio, ficha.getAnio()));
+            genero.setText(getString(R.string.detalle_genero, ficha.getGenero()));
+            sinopsis.setText(ficha.getSinopsis());
+        }
+
+        Object recurso = extras.get(EXTRA_IMAGEN);
+        int imagenResId = recurso instanceof Integer ? (Integer) recurso : 0;
+        if (imagenResId == R.drawable.interestelar || imagenResId == R.drawable.sherk
+                || imagenResId == R.drawable.spiderman) {
+            imagen.setImageResource(imagenResId);
+            imagen.setContentDescription(getString(R.string.descripcion_poster, nombrePelicula));
+        } else {
+            // No intentamos cargar un identificador arbitrario o de otro tipo de recurso.
+            imagen.setImageResource(R.drawable.ic_launcher_foreground);
+            imagen.setContentDescription(getString(R.string.imagen_no_disponible));
+            sinImagen.setVisibility(View.VISIBLE);
+        }
+    }
+}

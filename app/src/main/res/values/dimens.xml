@@ -5,4 +5,11 @@
     <dimen name="poster_alto">110dp</dimen>
     <dimen name="poster_margen">16dp</dimen>
 
+    <dimen name="detalle_padding">20dp</dimen>
+    <dimen name="detalle_espacio">24dp</dimen>
+    <dimen name="detalle_poster_ancho">230dp</dimen>
+    <dimen name="detalle_poster_alto">330dp</dimen>
+    <dimen name="detalle_titulo">27sp</dimen>
+    <dimen name="detalle_estado">19sp</dimen>
+    <dimen name="ficha_texto">16sp</dimen>
 </resources>
