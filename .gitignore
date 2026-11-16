@@ -13,3 +13,36 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Configuración personal y guías locales de trabajo
+/.idea/
+/AGENTS.md
+/.agents/
+
+# Paquetes compilados y datos privados de ejecución
+*.apk
+*.aab
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Credenciales y archivos de firma (no necesarios para esta entrega)
+.env
+.env.*
+key.properties
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+google-services.json
+
+# Diagnósticos y registros históricos locales; conservarlos fuera de la entrega
+/docs/parcial-2/diagnostico-boton/
+/docs/parcial-2/etapa-2-navegacion.md
+/docs/parcial-2/etapa-3-modelo-y-estado.md
+/docs/parcial-2/etapa-3-evidencia/
+/docs/parcial-2/**/*.xml
+/docs/parcial-2/fichas-evidencia/entorno-systemui.*
