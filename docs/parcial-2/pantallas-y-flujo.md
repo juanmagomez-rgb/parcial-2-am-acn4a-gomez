@@ -1,4 +1,6 @@
-# Pantallas, funcionalidades y flujo actual
+# Pantallas, funcionalidades y flujo de la etapa local
+
+**Pendiente de actualización para la entrega definitiva:** este documento no incluye la búsqueda TMDB, las tarjetas de resultados ni los créditos ya implementados. Ver el README principal para el alcance vigente.
 
 ## Alcance
 

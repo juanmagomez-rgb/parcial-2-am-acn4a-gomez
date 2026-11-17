@@ -1,6 +1,6 @@
 # Documentación del segundo parcial
 
-Estado consolidado de Mis Películas, 16/11/2026. Describe la implementación actual, no una etapa pendiente de aprobación.
+**Documento de la etapa local (16/11/2026), anterior a TMDB.** El informe definitivo queda pendiente de actualizar con búsqueda online, resultados personalizados y créditos; las capturas existentes corresponden a esa etapa local.
 
 - [Informe de pantallas y flujo](pantallas-y-flujo.md)
 - [Matriz de cumplimiento](evidencia-y-validacion.md)
