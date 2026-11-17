@@ -20,6 +20,50 @@ public class PeliculasDbInstrumentedTest {
     @Before public void preparar() { context.deleteDatabase(NOMBRE); }
     @After public void limpiar() { context.deleteDatabase(NOMBRE); }
 
+    @Test public void migracionConservaIdsEstadosYCalificacionSinPrecargar() {
+        try (android.database.sqlite.SQLiteDatabase anterior = context.openOrCreateDatabase(NOMBRE, 0, null)) {
+            anterior.execSQL("CREATE TABLE peliculas (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "titulo TEXT NOT NULL, vista INTEGER NOT NULL DEFAULT 0, calificacion INTEGER)");
+            anterior.execSQL("INSERT INTO peliculas VALUES (17, 'Mi película', 1, 4)");
+            anterior.setVersion(1);
+        }
+        try (PeliculasDbHelper db = new PeliculasDbHelper(context, NOMBRE, null)) {
+            ArrayList<Pelicula> lista = db.listar();
+            assertEquals(1, lista.size());
+            assertEquals(17, lista.get(0).getId());
+            assertTrue(lista.get(0).isVista());
+            assertEquals(0, lista.get(0).getIdTmdb());
+            try (Cursor c = db.getReadableDatabase().rawQuery("SELECT calificacion FROM peliculas", null)) {
+                assertTrue(c.moveToFirst()); assertEquals(4, c.getInt(0));
+            }
+            db.eliminar(17);
+        }
+        try (PeliculasDbHelper db = new PeliculasDbHelper(context, NOMBRE, null)) {
+            assertTrue(db.listar().isEmpty());
+        }
+    }
+
+    @Test public void datosRemotosPersistenConEstadoYDuplicadosIndependientes() {
+        Pelicula remota = new Pelicula(0, "Título remoto", R.drawable.ic_launcher_foreground,
+                false, 123, "2020-01-02", "Descripción guardada", "/abc.jpg");
+        long id;
+        try (PeliculasDbHelper db = new PeliculasDbHelper(context, NOMBRE, new ArrayList<>())) {
+            id = db.agregar(remota).getId();
+            assertNotEquals(id, db.agregar(remota).getId());
+            db.marcarVista(id);
+        }
+        try (PeliculasDbHelper db = new PeliculasDbHelper(context, NOMBRE, null)) {
+            Pelicula guardada = db.listar().get(0);
+            assertEquals(id, guardada.getId()); assertTrue(guardada.isVista());
+            assertEquals(123, guardada.getIdTmdb());
+            assertEquals("2020-01-02", guardada.getEstreno());
+            assertEquals("Descripción guardada", guardada.getSinopsis());
+            assertEquals("/abc.jpg", guardada.getPoster());
+            assertFalse(db.listar().get(1).isVista());
+            db.eliminar(id); assertEquals(1, db.listar().size());
+        }
+    }
+
     @Test public void duplicadosTienenIdsUnicosYSeModificanPorId() {
         long segundo;
         try (PeliculasDbHelper db = new PeliculasDbHelper(context, NOMBRE, new ArrayList<>())) {

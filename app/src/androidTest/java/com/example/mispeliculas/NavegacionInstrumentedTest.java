@@ -358,6 +358,51 @@ public class NavegacionInstrumentedTest {
         }
     }
 
+    @Test public void fichaRemotaGuardadaConservaExtrasYEstadoAlRecrear() {
+        abrirPrincipal();
+        instrumentation.runOnMainSync(() -> principal.finish());
+        instrumentation.waitForIdleSync();
+        // Datos controlados: no se presenta esta prueba como una consulta real a TMDB.
+        try (PeliculasDbHelper db = new PeliculasDbHelper(instrumentation.getTargetContext())) {
+            Pelicula pelicula = db.agregar(new Pelicula(0, "Shrek", R.drawable.ic_launcher_foreground,
+                    false, 999, "2020-01-02", "Sinopsis remota guardada", ""));
+            db.marcarVista(pelicula.getId());
+        }
+        MainActivity activity = abrirPrincipalConDatos();
+        comprobarPrincipal(activity, 1, 1);
+        instrumentation.runOnMainSync(activity::recreate);
+        MainActivity recreada = esperarNuevaPrincipal(activity);
+        comprobarPrincipal(recreada, 1, 1);
+        abrirDetalle(recreada);
+        instrumentation.runOnMainSync(() -> {
+            assertEquals("Año de estreno: 2020", ((TextView) detalle.findViewById(R.id.txtDetalleAnio)).getText().toString());
+            assertEquals("Sinopsis remota guardada", ((TextView) detalle.findViewById(R.id.txtDetalleSinopsis)).getText().toString());
+            assertEquals(View.GONE, detalle.findViewById(R.id.txtDetalleGenero).getVisibility());
+            assertEquals(999, detalle.getIntent().getLongExtra("idTmdb", 0));
+            detalle.findViewById(R.id.btnVolverLista).performClick();
+        });
+        comprobarPrincipal(recreada, 1, 1);
+        instrumentation.runOnMainSync(() -> boton(recreada, 0, "Eliminar").performClick());
+        comprobarPrincipal(recreada, 0, 0);
+    }
+
+    @Test public void busquedaVaciaYTokenAusentePermitenAgregarManual() {
+        MainActivity activity = abrirPrincipal();
+        instrumentation.runOnMainSync(() -> {
+            activity.findViewById(R.id.btnBuscar).performClick();
+            assertEquals(activity.getString(R.string.mensaje_nombre_vacio),
+                    ((TextView) activity.findViewById(R.id.txtBusqueda)).getText().toString());
+            if (BuildConfig.TMDB_TOKEN.isEmpty()) {
+                activity.editPelicula.setText("Shrek");
+                activity.findViewById(R.id.btnBuscar).performClick();
+                assertEquals(activity.getString(R.string.tmdb_sin_token),
+                        ((TextView) activity.findViewById(R.id.txtBusqueda)).getText().toString());
+            }
+        });
+        agregar(activity, "Mi película manual");
+        comprobarPrincipal(activity, 1, 0);
+    }
+
     @Test
     public void imagenAusenteDesconocidaOTipoIncorrectoUsaAlternativa() {
         for (int caso = 0; caso < 3; caso++) {
