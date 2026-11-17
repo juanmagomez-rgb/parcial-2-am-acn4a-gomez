@@ -33,4 +33,22 @@
     <string name="detalle_anio">Año de estreno: %1$d</string>
     <string name="detalle_genero">Género: %1$s</string>
     <string name="descripcion_no_disponible">Descripción no disponible</string>
+    <string name="tmdb_buscar">Buscar en TMDB</string>
+    <string name="tmdb_sin_token">Búsqueda online sin configurar. Podés agregar películas manualmente.</string>
+    <string name="tmdb_cargando">Buscando en TMDB…</string>
+    <string name="tmdb_token_invalido">TMDB rechazó la credencial. Revisá la configuración local.</string>
+    <string name="tmdb_limite">Se alcanzó el límite de consultas. Intentá más tarde.</string>
+    <string name="tmdb_error">No se pudo leer la respuesta de TMDB. Intentá nuevamente.</string>
+    <string name="tmdb_sin_conexion">No se pudo conectar con TMDB. Revisá Internet e intentá nuevamente. Tu lista sigue disponible.</string>
+    <string name="tmdb_sin_resultados">No se encontraron películas para ese título.</string>
+    <string name="tmdb_seleccionar">Elegí la película que querés agregar (primera página de resultados).</string>
+    <string name="tmdb_resultados">Resultados de TMDB</string>
+    <string name="tmdb_agregada">Película guardada en tu lista.</string>
+    <string name="boton_cancelar">Cancelar</string>
+    <!-- Atribución obligatoria de TMDB -->
+    <string name="tmdb_creditos">Créditos · TMDB</string>
+    <string name="tmdb_logo">The Movie Database (TMDB)</string>
+    <string name="tmdb_aviso">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
+    <string name="tmdb_fuente">https://www.themoviedb.org</string>
+    <string name="boton_cerrar">Cerrar</string>
 </resources>

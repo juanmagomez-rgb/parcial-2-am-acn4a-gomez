@@ -1,0 +1,2 @@
+# Copiar a tmdb.properties en la raiz. Usar API Read Access Token, sin prefijo Bearer.
+tokenTmdb=

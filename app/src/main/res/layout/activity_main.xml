@@ -66,6 +66,35 @@
             android:backgroundTint="@color/rojo_principal"
             android:layout_marginTop="8dp" />
 
+        <Button
+            android:id="@+id/btnBuscar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tmdb_buscar"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/superficie_boton" />
+
+        <TextView
+            android:id="@+id/txtBusqueda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/texto_secundario"
+            android:textSize="14sp"
+            android:accessibilityLiveRegion="polite" />
+
+        <TextView
+            android:id="@+id/txtCreditos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="end"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/tmdb_creditos"
+            android:textSize="12sp"
+            android:textColor="@color/texto_secundario" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

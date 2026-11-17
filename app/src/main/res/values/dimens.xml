@@ -12,4 +12,10 @@
     <dimen name="detalle_titulo">27sp</dimen>
     <dimen name="detalle_estado">19sp</dimen>
     <dimen name="ficha_texto">16sp</dimen>
+    <!-- Ventanas de resultados y créditos -->
+    <dimen name="resultados_alto">480dp</dimen>
+    <dimen name="dialogo_margen">32dp</dimen>
+    <dimen name="dialogo_ancho">600dp</dimen>
+    <dimen name="creditos_padding">24dp</dimen>
+    <dimen name="creditos_logo_ancho">154dp</dimen>
 </resources>

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.bumptech.glide.Glide;
 
 public class DetallePeliculaActivity extends AppCompatActivity {
 
@@ -54,6 +55,11 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         TextView anio = findViewById(R.id.txtDetalleAnio);
         TextView genero = findViewById(R.id.txtDetalleGenero);
         TextView sinopsis = findViewById(R.id.txtDetalleSinopsis);
+        Object idTmdb = extras.get("idTmdb");
+        if (idTmdb instanceof Long && (Long) idTmdb > 0) {
+            mostrarRemota(extras, anio, genero, sinopsis, imagen, nombrePelicula);
+            return;
+        }
         CatalogoPeliculas.Ficha ficha = CatalogoPeliculas.fichaParaTitulo(nombrePelicula);
         if (ficha == null) {
             anio.setVisibility(View.GONE);
@@ -77,5 +83,26 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             imagen.setContentDescription(getString(R.string.imagen_no_disponible));
             sinImagen.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void mostrarRemota(Bundle datos, TextView anio, TextView genero,
+                               TextView sinopsis, ImageView imagen, String titulo) {
+        genero.setVisibility(View.GONE);
+        String estreno = texto(datos, "estreno");
+        if (estreno.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
+            anio.setText(getString(R.string.detalle_anio, Integer.parseInt(estreno.substring(0, 4))));
+        } else anio.setVisibility(View.GONE);
+        String descripcion = texto(datos, "sinopsis");
+        sinopsis.setText(descripcion.isEmpty() ? getString(R.string.descripcion_no_disponible) : descripcion);
+        Glide.with(this).load(Tmdb.urlPoster(texto(datos, "poster")))
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+                .fallback(R.drawable.ic_launcher_foreground).into(imagen);
+        imagen.setContentDescription(getString(R.string.descripcion_poster, titulo));
+    }
+
+    private String texto(Bundle datos, String clave) {
+        Object valor = datos.get(clave);
+        return valor instanceof String ? ((String) valor).trim() : "";
     }
 }

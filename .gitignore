@@ -46,3 +46,4 @@ google-services.json
 /docs/parcial-2/etapa-3-evidencia/
 /docs/parcial-2/**/*.xml
 /docs/parcial-2/fichas-evidencia/entorno-systemui.*
+/tmdb.properties
